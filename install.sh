@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-[[ -s ~/.profile ]] && source ~/.profile
-
 PROFILE="$HOME/.bash_profile"
 
 if [ -e "$PROFILE" ]
@@ -10,3 +8,5 @@ then
 else
    ln -s ~/.dotfiles/bash_profile $PROFILE
 fi
+
+git config --global include.path .dotfiles/.gitconfig
