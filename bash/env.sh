@@ -1,5 +1,4 @@
 export EDITOR='vim'
-export TERM='xterm-256color'    # colors in Vim
 export HISTCONTROL=ignoredups
 
 # Pow shouldn't hide errors in non-ASCII apps:
