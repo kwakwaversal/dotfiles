@@ -4,7 +4,7 @@
 # pwilliams@ubu project_dir perl-5.24.0 master*$
 
 function __plenv_prompt {
-  echo "perl-`plenv version | awk '{print $1}'`"
+  echo "perl-`perl -e 'print substr($^V, 1);'`"
 }
 
 function __git_prompt {
