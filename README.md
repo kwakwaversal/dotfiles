@@ -2,8 +2,8 @@
 My ~/.dotfiles directory. All hail dotfiles.
 
 # Installation
-Dotfiles specific to my shell environment. You might find something useful in
-here, but I highly doubt it.
+Dotfiles specific to my `BASH` shell environment. You might find something
+useful in here, but I highly doubt it.
 
 ```bash
 git clone git@github.com:kwakwaversal/dotfiles.git ~/.dotfiles
@@ -15,3 +15,6 @@ doesn't currently exist.
 ```sh
 sh ~/.dotfiles/install.sh
 ```
+
+# References
+* [Bash keyboard shortcuts](https://ss64.com/bash/syntax-keyboard.html)
