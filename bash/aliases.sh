@@ -12,11 +12,14 @@ alias dc='docker-compose'
 
 # git
 alias g="git"
-alias gs="git status"
-alias gw="git show"
-alias gw^="git show HEAD^"
-alias gw^^="git show HEAD^^"
-alias gw^^^="git show HEAD^^^"
-alias gw^^^^="git show HEAD^^^^"
+alias gb="git checkout -b"
+alias go="git checkout"
+alias gom="git checkout master"
 alias gd="git diff HEAD"        # What's changed? Both staged and unstaged.
 alias gdo="git diff --cached"   # What's changed? Only staged (added) changes.
+alias gs="git status"
+alias gw="git show"
+alias gw^^^^="git show head^^^^"
+alias gw^^^="git show head^^^"
+alias gw^^="git show head^^"
+alias gw^="git show head^"
