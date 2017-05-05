@@ -10,6 +10,12 @@ alias d-ips='docker ps -q | while read cid b; do echo -n "$cid "; d inspect $cid
 # docker-compose related (don't care about the dc precision calculator)
 alias dc='docker-compose'
 
+# https://github.com/junegunn/fzf
+alias f='fzf -m --height 50%'
+alias fv='vim -p $(fzf -m --height 50%)'
+alias ft='fzf-tmux -m'
+alias ftv='vim -p $(fzf-tmux -m)'
+
 # git
 alias g="git"
 alias gb="git checkout -b"

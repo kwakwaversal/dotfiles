@@ -18,3 +18,4 @@ sh ~/.dotfiles/install.sh
 
 # References
 * [Bash keyboard shortcuts](https://ss64.com/bash/syntax-keyboard.html)
+* [Command-line fuzzy finder - fzf](https://github.com/junegunn/fzf)
