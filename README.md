@@ -6,7 +6,7 @@ Dotfiles specific to my `BASH` shell environment. You might find something
 useful in here, but I highly doubt it.
 
 ```bash
-git clone git@github.com:kwakwaversal/dotfiles.git ~/.dotfiles
+git clone https://github.com/kwakwaversal/dotfiles.git ~/.dotfiles
 ```
 
 Run the script to set up symlinks. It will only create a symlink if the file
