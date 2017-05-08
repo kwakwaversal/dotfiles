@@ -3,6 +3,7 @@
 [alias]
     f  = "!git ls-files | grep -i"
     fl = log -u
+    la = "!git config -l | grep alias | cut -c 7-"
     ls = log --pretty=format:"%C(green)%h\\ %C(yellow)[%ad]%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=relative
     ll = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
     lg = log --pretty=format:'%Cred%h %C(green)(%cr)%Creset %C(blue)%aN%n%s%n%b' --graph --color=always
