@@ -18,9 +18,9 @@ alias ftv='vim -p $(fzf-tmux -m)'
 
 # git
 alias g="git"
-alias gb="git checkout -b"
-alias go="git checkout"
-alias gom="git checkout master"
+alias gcb="git checkout -b"
+alias gco="git checkout"
+alias gcm="git checkout master"
 alias gd="git diff HEAD"        # What's changed? Both staged and unstaged.
 alias gdo="git diff --cached"   # What's changed? Only staged (added) changes.
 alias gs="git status"
