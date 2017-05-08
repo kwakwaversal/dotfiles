@@ -19,3 +19,4 @@ sh ~/.dotfiles/install.sh
 # References
 * [Bash keyboard shortcuts](https://ss64.com/bash/syntax-keyboard.html)
 * [Command-line fuzzy finder - fzf](https://github.com/junegunn/fzf)
+* [Must have git aliases](http://durdn.com/blog/2012/11/22/must-have-git-aliases-advanced-examples/)
