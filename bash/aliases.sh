@@ -29,3 +29,10 @@ alias gw^^^^="git show head^^^^"
 alias gw^^^="git show head^^^"
 alias gw^^="git show head^^"
 alias gw^="git show head^"
+
+# Might require `apt-get install bash-completion`.
+if [ -e "/usr/share/bash-completion/completions/git" ]
+then
+    source /usr/share/bash-completion/completions/git
+    __git_complete g _git
+fi
