@@ -3,6 +3,9 @@
 PROFILE="$HOME/.bash_profile"
 TMUX="$HOME/.tmux.conf"
 
+echo "Bootstrapping environment to use ~/.dotfiles"
+
+echo ""
 echo "Symlink $PROFILE:"
 echo "  - ln -s ~/.dotfiles/bash_profile $PROFILE"
 if [ -e "$PROFILE" ]
@@ -18,6 +21,7 @@ else
    fi
 fi
 
+echo ""
 echo "Symlink $TMUX:"
 echo "  - ln -s ~/.dotfiles/tmux.conf $TMUX"
 if [ -e "$TMUX" ]
