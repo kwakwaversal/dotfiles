@@ -24,9 +24,12 @@ alias gw^^^="git show head^^^"
 alias gw^^="git show head^^"
 alias gw^="git show head^"
 
-# Might require `apt-get install bash-completion`.
+# might require `apt-get install bash-completion`
 if [ -e "/usr/share/bash-completion/completions/git" ]
 then
     source /usr/share/bash-completion/completions/git
     __git_complete g _git
 fi
+
+# https://unix.stackexchange.com/questions/1045/getting-256-colors-to-work-in-tmux
+alias tmux="TERM=xterm-256color tmux"
