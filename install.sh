@@ -3,18 +3,34 @@
 PROFILE="$HOME/.bash_profile"
 TMUX="$HOME/.tmux.conf"
 
+echo "Symlink $PROFILE:"
+echo "  - ln -s ~/.dotfiles/bash_profile $PROFILE"
 if [ -e "$PROFILE" ]
 then
-   echo "File $PROFILE exists. Doing nothing."
+   echo "    - Already exists. Doing nothing."
 else
    ln -s ~/.dotfiles/bash_profile $PROFILE
+   if [ -e "$PROFILE" ]
+   then
+       echo "    + Added"
+   else
+       echo "    - Could not create symlink?"
+   fi
 fi
 
+echo "Symlink $TMUX:"
+echo "  - ln -s ~/.dotfiles/tmux.conf $TMUX"
 if [ -e "$TMUX" ]
 then
-   echo "File $TMUX exists. Doing nothing."
+   echo "    - Already exists. Doing nothing."
 else
    ln -s ~/.dotfiles/tmux.conf $TMUX
+   if [ -e "$TMUX" ]
+   then
+       echo "    + Added"
+   else
+       echo "    - Could not create symlink?"
+   fi
 fi
 
 git config --global include.path .dotfiles/.gitconfig
