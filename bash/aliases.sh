@@ -33,3 +33,8 @@ fi
 
 # https://unix.stackexchange.com/questions/1045/getting-256-colors-to-work-in-tmux
 alias tmux="TERM=xterm-256color tmux"
+
+# https://unencumberedbyfacts.com/2016/01/04/psql-vim-happy-face/
+# http://www.craigkerstiens.com/2013/02/21/more-out-of-psql/
+#   vim --servername PSQL
+alias psql='EDITOR="vim --servername PSQL --remote-tab-wait" PAGER="vim -R -u ~/.vim/vimrcpg -" psql'
