@@ -13,6 +13,7 @@ alias dc='docker-compose'
 # git
 alias g='git'
 alias gcb='git checkout -b'
+alias gcd='cd $(git rev-parse --show-toplevel)' # change to repo root directory
 alias gco='git checkout'
 alias gcm='git checkout master'
 alias gd='git diff HEAD'        # What's changed? Both staged and unstaged.
