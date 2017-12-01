@@ -39,3 +39,6 @@ alias tmux='TERM=xterm-256color tmux'
 # http://www.craigkerstiens.com/2013/02/21/more-out-of-psql/
 #   vim --servername PSQL
 alias psql='EDITOR="vim --servername PSQL --remote-tab-wait" PAGER="vim -R -u ~/.vim/vimrcpg -" psql'
+
+# miscellaneous
+alias weeknumber='date +%V'
