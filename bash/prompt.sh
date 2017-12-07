@@ -1,6 +1,20 @@
 # http://blog.bitfluent.com/post/27983389/git-utilities-you-cant-live-without
 # http://superuser.com/questions/31744/how-to-get-git-completion-bash-to-work-on-mac-os-x
+# https://unix.stackexchange.com/questions/1288/preserve-bash-history-in-multiple-terminal-windows
 
+# Persist history across multiple tmux windows
+#
+# Avoid duplicates
+HISTCONTROL=ignoredups:erasedups
+
+# When the shell exits, append to the history file instead of overwriting it
+shopt -s histappend
+
+# After each command, append to the history file and reread it
+PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r"
+
+# Customise the PROMPT to be more dev-like
+#
 # pwilliams@ubu project_dir perl-5.24.0 master*$
 
 function __plenv_prompt {
