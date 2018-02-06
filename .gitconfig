@@ -6,6 +6,7 @@
     cl   = clone
     co   = checkout
     cp   = cherry-pick
+    d    = difftool
     dc   = diff --cached
     diff = diff --word-diff
     f    = "!git ls-files | grep -i"
@@ -19,6 +20,16 @@
 
 [core]
     editor = vim
+
+[diff]
+    tool = vimdiff
+
+[difftool]
+    prompt = false
+
+[merge]
+    log = 20
+    tool = vimdiff
 
 [pull]
     rebase = true
