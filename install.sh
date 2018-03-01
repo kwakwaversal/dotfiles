@@ -2,8 +2,9 @@
 
 declare -A dotfiles
 dotfiles["bash_profile"]="$HOME/.bash_profile"
-dotfiles["tmux.conf"]="$HOME/.tmux.conf"
 dotfiles["psqlrc"]="$HOME/.psqlrc"
+dotfiles["perltidyrc"]="$HOME/.perltidyrc"
+dotfiles["tmux.conf"]="$HOME/.tmux.conf"
 
 echo "Bootstrapping environment to use ~/.dotfiles"
 

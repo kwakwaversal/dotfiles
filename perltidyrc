@@ -1,0 +1,5 @@
+-pbp     # Start with Perl Best Practices
+-bt=2    # High brace tightness
+-i=4     # Indentation is 4 columns
+-pt=2    # High parenthesis tightness
+-sbt=2   # High square bracket tightness
