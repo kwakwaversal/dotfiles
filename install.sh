@@ -29,4 +29,4 @@ for file in ${!dotfiles[@]}; do
     fi
 done
 
-git config --global include.path .dotfiles/.gitconfig
+git config --global include.path .dotfiles/gitconfig
