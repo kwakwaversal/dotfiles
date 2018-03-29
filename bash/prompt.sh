@@ -5,20 +5,25 @@
 # Persist history across multiple tmux windows
 #
 # Avoid duplicates
-HISTCONTROL=ignoredups:erasedups
+export HISTCONTROL=ignoredups:erasedups
 
 # When the shell exits, append to the history file instead of overwriting it
 shopt -s histappend
 
-# After each command, append to the history file and reread it
-PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r"
+# PROMPT_COMMAND is complicated but thankfully the link below explains things
+# https://unix.stackexchange.com/questions/18212/bash-history-ignoredups-and-erasedups-setting-conflict-with-common-history/18443#18443
+PROMPT_COMMAND="history -n; history -w; history -c; history -r; $PROMPT_COMMAND"
 
 # Customise the PROMPT to be more dev-like
 #
 # pwilliams@ubu project_dir perl-5.24.0 master*$
 
-function __plenv_prompt {
-  echo "perl-`perl -e 'print substr($^V, 1);'`"
+function __node_prompt {
+  echo "node-`node -v`"
+}
+
+function __perl_prompt {
+  echo "perl-v`perl -e 'print substr($^V, 1);'`"
 }
 
 function __git_prompt {
@@ -59,7 +64,7 @@ bash_prompt() {
   # reset
   local RESET="\[\033[0;37m\]"
 
-  PS1="$BY\$(__name_and_server)$Y\W$G \$(__plenv_prompt)$G\$(__git_prompt)$RESET$ "
+  PS1="$BY\$(__name_and_server)$Y\W$G\$(__git_prompt)$RESET$ "
 
 }
 
