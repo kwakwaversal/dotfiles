@@ -19,6 +19,7 @@ alias gco='git checkout'
 alias gcm='git checkout master'
 alias gd='git diff HEAD'        # What's changed? Both staged and unstaged.
 alias gdo='git diff --cached'   # What's changed? Only staged (added) changes.
+alias gl='git log'
 alias gs='git status'
 alias gw='git show'
 alias gw^^^^='git show HEAD^^^^'
