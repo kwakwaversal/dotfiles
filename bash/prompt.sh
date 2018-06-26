@@ -62,7 +62,7 @@ bash_prompt() {
   local BW="\[\033[1;37m\]"
 
   # reset
-  local RESET="\[\033[0;37m\]"
+  local RESET="\[\033[0;37m\]\[\e[0m\]"
 
   PS1="$BY\$(__name_and_server)$Y\W$G\$(__git_prompt)$RESET$ "
 
