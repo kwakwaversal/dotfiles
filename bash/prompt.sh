@@ -4,8 +4,8 @@
 
 # Persist history across multiple tmux windows
 #
-# Avoid duplicates
-export HISTCONTROL=ignoredups:erasedups
+# Avoid duplicates & commands with leading spaces are ignored
+export HISTCONTROL=ignoredups:erasedups:ignorespace
 
 # When the shell exits, append to the history file instead of overwriting it
 shopt -s histappend
