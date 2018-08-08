@@ -44,3 +44,6 @@
 
 [url "git@gitlab.com:"]
     insteadOf = https://gitlab.com/
+
+[url "git@github.com:kwakwaversal/"]
+    insteadOf = my:
