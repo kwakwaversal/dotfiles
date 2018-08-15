@@ -1,4 +1,4 @@
-# management
+# dotfile management
 alias dots='cd ~/.dotfiles && vim'
 alias reload='source ~/.bash_profile && echo "sourced ~/.bash_profile"'
 alias redot='cd ~/.dotfiles && git pull && ./install.sh; cd -'
@@ -19,12 +19,11 @@ function g {
         git status
     fi
 }
-alias gcb='git checkout -b'
+alias ga='git add'
+alias gc='git commit'
 alias gcd='cd $(git rev-parse --show-toplevel)' # change to repo root directory
-alias gco='git checkout'
-alias gcm='git checkout master'
-alias gd='git diff HEAD'        # What's changed? Both staged and unstaged.
-alias gdo='git diff --cached'   # What's changed? Only staged (added) changes.
+alias gd='git diff'             # What's changed? Both staged and unstaged.
+alias gds='git diff --staged'   # What's changed? Only staged (added) changes.
 alias gl='git log'
 alias gw='git show'
 alias gw^^^^='git show HEAD^^^^'
