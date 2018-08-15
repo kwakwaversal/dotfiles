@@ -12,7 +12,13 @@ alias dpwd='docker run -it --rm -v $(pwd):/pwd'
 alias dc='docker-compose'
 
 # git
-alias g='git'
+function g {
+    if [[ $# > 0 ]]; then
+        git $@
+    else
+        git status
+    fi
+}
 alias gcb='git checkout -b'
 alias gcd='cd $(git rev-parse --show-toplevel)' # change to repo root directory
 alias gco='git checkout'
@@ -20,7 +26,6 @@ alias gcm='git checkout master'
 alias gd='git diff HEAD'        # What's changed? Both staged and unstaged.
 alias gdo='git diff --cached'   # What's changed? Only staged (added) changes.
 alias gl='git log'
-alias gs='git status'
 alias gw='git show'
 alias gw^^^^='git show HEAD^^^^'
 alias gw^^^='git show HEAD^^^'
