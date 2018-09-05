@@ -22,7 +22,7 @@ then
     echo "  - git clone fzf"
     git clone https://github.com/junegunn/fzf.git $HOME/.fzf
     echo "  - install fzf"
-    $HOME/.fzf/install
+    $HOME/.fzf/install --key-bindings --completion --update-rc
 fi
 
 $HOME/.dotfiles/install.sh
