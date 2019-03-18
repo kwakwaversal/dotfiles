@@ -48,3 +48,4 @@ alias psql='EDITOR="vim --servername PSQL --remote-tab-wait" PAGER="vim -R -u ~/
 
 # miscellaneous
 alias weeknumber='date +%V'
+alias makefile-targets='grep "^[^#[:space:]].*:" Makefile'
