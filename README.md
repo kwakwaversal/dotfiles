@@ -45,11 +45,22 @@ If you have [fzf] installed, `CTRL+f` has been rebound to append `| fzf` to the
 end of the current command *AND* immediately send `<return>`. See
 [bash/bindings.sh](bash/bindings.sh) for implemtation details.
 
+# Conditional tools
+
+These tools will enable additional bindings if they exist.
+
+## GoTTY - Share your terminal as a web application
+
+If [gotty] is in the `PATH` it will add the [tmux] binding `CTRL-t`. This will
+share your tmux session with the default [gotty] parameters.
+
 # References
 * [BASH keyboard shortcuts](https://ss64.com/bash/syntax-keyboard.html)
 * [Command-line fuzzy finder - fzf](https://github.com/junegunn/fzf)
 * [Must have git aliases](http://durdn.com/blog/2012/11/22/must-have-git-aliases-advanced-examples/)
 
 [BASH]: https://www.gnu.org/software/bash/
-[fzf]: https://github.com/junegunn/fzf
+[fzf]: https://github.com/junegunn/fzfo
+[gotty]: https://github.com/yudai/gotty
+[tmux]: https://github.com/tmux/tmux
 [zsh]: http://www.zsh.org/
