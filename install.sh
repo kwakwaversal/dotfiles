@@ -2,6 +2,7 @@
 
 declare -A dotfiles
 dotfiles["bash_profile"]="$HOME/.bash_profile"
+dotfiles["my.cnf"]="$HOME/.my.cnf"
 dotfiles["psqlrc"]="$HOME/.psqlrc"
 dotfiles["perltidyrc"]="$HOME/.perltidyrc"
 dotfiles["tmux.conf"]="$HOME/.tmux.conf"
