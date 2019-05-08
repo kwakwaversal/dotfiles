@@ -34,6 +34,9 @@ alias gw^^^='git show HEAD^^^'
 alias gw^^='git show HEAD^^'
 alias gw^='git show HEAD^'
 
+# misc
+alias bigdirs='du --block-size=1 -a $(pwd) | sort -n -r | head -n 20 | numfmt --to=iec-i'
+
 # might require `apt-get install bash-completion`
 if [ -e '/usr/share/bash-completion/completions/git' ]
 then
