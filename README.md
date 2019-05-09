@@ -29,6 +29,16 @@ Symlink /home/vagrant/.bash_profile:
     + Added
 ```
 
+## Docker
+
+```console
+$ docker build . --build-arg GIT_COMMITTER_EMAIL=my@email.com -t env
+```
+
+Builds a docker image containing my dev environment. This enables me to a) test
+new commandline tools easily, b) edit root owned files and commit them to git
+as my user without having to install anything on the host machine.
+
 # Oh my (BASH) shell
 Until I'm finally cajoled into using [zsh] by a work colleague, my current shell
 is [BASH]. The [BASH README](bash/README.md) contains specific information about
