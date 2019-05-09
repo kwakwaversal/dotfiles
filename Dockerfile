@@ -1,9 +1,9 @@
 FROM ubuntu:cosmic
 
-ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ GB
 
 RUN \
+  export DEBIAN_FRONTEND=noninteractive && \
   apt update && \
   apt install -y \
     curl \
