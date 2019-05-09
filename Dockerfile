@@ -27,6 +27,8 @@ ARG GIT_COMMITTER_EMAIL
 ENV GIT_COMMITTER_NAME  $GIT_COMMITTER_NAME
 ENV GIT_COMMITTER_EMAIL $GIT_COMMITTER_EMAIL
 
+ENV TERM=xterm-256color
+
 RUN \
   git clone https://github.com/kwakwaversal/dotfiles.git $HOME/.dotfiles && \
   $HOME/.dotfiles/myinstall.sh && \
