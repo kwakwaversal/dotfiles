@@ -10,6 +10,7 @@ RUN \
     bash-completion \
     curl \
     git \
+    inetutils-ping \
     jq \
     locales \
     make \
