@@ -6,8 +6,11 @@ RUN \
   export DEBIAN_FRONTEND=noninteractive && \
   apt update && \
   apt install -y \
+    ack \
+    bash-completion \
     curl \
     git \
+    jq \
     locales \
     make \
     tmuxinator \
