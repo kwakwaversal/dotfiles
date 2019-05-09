@@ -13,9 +13,7 @@ RUN \
     tmuxinator \
     tree \
     vim-gtk && \
-  # locale-gen en_GB en_GB.UTF-8 && \
-  # dpkg-reconfigure locales && \
-  # update-locale LANG=en_GB.UTF-8 && \
+  locale-gen en_GB en_GB.UTF-8 && dpkg-reconfigure locales && update-locale LANG=en_GB.UTF-8 && \
   rm /usr/bin/tmuxinator && gem install tmuxinator && \
   rm -rf /var/lib/apt/lists/*
 
