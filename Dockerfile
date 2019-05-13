@@ -14,6 +14,7 @@ RUN \
     jq \
     locales \
     make \
+    silversearcher-ag \
     tmuxinator \
     tree \
     vim-gtk && \
