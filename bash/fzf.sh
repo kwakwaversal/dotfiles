@@ -10,6 +10,13 @@ alias fv='vim -p $(fzf -m --height 50%)'
 alias ft='fzf-tmux -m'
 alias ftv='vim -p $(fzf-tmux -m)'
 
+# https://github.com/junegunn/fzf.vim/issues/576
+# Use `ag` as the default search command for FZF if it exists
+if hash ag >/dev/null 2>&1; then
+  export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git --ignore node_modules -g ""'
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+fi
+
 # Using highlight (http://www.andre-simon.de/doku/highlight/en/highlight.html)
 export FZF_CTRL_T_OPTS="--preview '(highlight -O ansi -l {} 2> /dev/null || cat {} || tree -C {}) 2> /dev/null | head -200'"
 
