@@ -4,6 +4,9 @@ ENV TZ GB
 
 RUN \
   export DEBIAN_FRONTEND=noninteractive && \
+  apt update && apt install -y gpg && \
+  echo "deb http://ppa.launchpad.net/jonathonf/vim/ubuntu cosmic main" | tee /etc/apt/sources.list.d/vim.list && \
+  apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 8CF63AD3F06FC659 && \
   apt update && \
   apt install -y \
     ack \
