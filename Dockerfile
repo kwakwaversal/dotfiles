@@ -17,13 +17,18 @@ RUN \
     jq \
     locales \
     make \
+    npm \
     silversearcher-ag \
     tmuxinator \
     tree \
-    vim-gtk && \
+    vim && \
   locale-gen en_GB en_GB.UTF-8 && dpkg-reconfigure locales && update-locale LANG=en_GB.UTF-8 && \
   rm /usr/bin/tmuxinator && gem install tmuxinator && \
-  rm -rf /var/lib/apt/lists/*
+  rm -rf /var/lib/apt/lists/* && \
+  npm install -g \
+    yarn \
+    sql-formatter-cli
+
 
 ARG GIT_COMMITTER_NAME="Paul Williams"
 ARG GIT_COMMITTER_EMAIL 
