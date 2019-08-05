@@ -1,0 +1,14 @@
+# Basic options
+--recurse=yes
+--tag-relative=yes
+--exclude=.git
+--exclude=\*.bak
+--exclude=\*.log
+--exclude=\*.map
+--exclude=\*.min.\*
+--exclude=\*.pyc
+--exclude=\*.sln
+--exclude=\*.swp
+--exclude=node_modules
+
+# https://medium.com/adorableio/modern-javascript-ctags-configuration-199884dbcc1
