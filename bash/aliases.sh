@@ -12,7 +12,13 @@ alias dpwd='docker run -it --rm -v $(pwd):/pwd'
 alias dpwdu='docker run -it --rm -u $(id -u):$(id -g) -v $(pwd):/pwd'
 
 # docker-compose related (don't care about the dc precision calculator)
-alias dc='docker-compose'
+function dc {
+    if [[ $# > 0 ]]; then
+        docker-compose $@
+    else
+        docker-compose ps
+    fi
+}
 
 # git
 function g {
