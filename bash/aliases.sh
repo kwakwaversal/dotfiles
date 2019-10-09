@@ -1,6 +1,7 @@
-# dotfile management
+# dotfile and vimfile management
+alias cdv='cd ~/.vim'
 alias dots='cd ~/.dotfiles && vim'
-alias reload='source ~/.bash_profile && echo "sourced ~/.bash_profile"'
+alias reload='exec $SHELL -l'
 alias redot='cd ~/.dotfiles && git pull && ./install.sh; cd -'
 
 # docker related
