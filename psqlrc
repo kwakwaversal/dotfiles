@@ -5,6 +5,8 @@
 \pset linestyle unicode
 \pset null ¤
 
+\pset format wrapped
+
 \set HISTSIZE 2000
 \set HISTCONTROL ignoredups
 \set PROMPT1 '%M:%[%033[1;31m%]%>%[%033[0m%] %n@%[%033[1m%]%/%[%033[0m%]%R%#%x '
