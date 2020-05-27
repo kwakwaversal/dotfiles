@@ -59,7 +59,7 @@ alias tx='TERM=xterm-256color tmuxinator'
 # https://unencumberedbyfacts.com/2016/01/04/psql-vim-happy-face/
 # http://www.craigkerstiens.com/2013/02/21/more-out-of-psql/
 #   vim --servername PSQL
-alias psql='EDITOR="vim --servername PSQL --remote-tab-wait" PAGER="vim -R -u ~/.vim/vimrcpg -" psql'
+# alias psql='EDITOR="vim --servername PSQL --remote-tab-wait" PAGER="vim -R -u ~/.vim/vimrcpg -" psql'
 
 # miscellaneous
 alias weeknumber='date +%V'
