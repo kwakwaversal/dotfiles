@@ -6,7 +6,10 @@ dotfiles["ctags"]="$HOME/.ctags"
 dotfiles["my.cnf"]="$HOME/.my.cnf"
 dotfiles["psqlrc"]="$HOME/.psqlrc"
 dotfiles["perltidyrc"]="$HOME/.perltidyrc"
+dotfiles["sqitch/templates"]="$HOME/.sqitch/templates"
 dotfiles["tmux.conf"]="$HOME/.tmux.conf"
+
+mkdir -p $HOME/.sqitch
 
 echo "Bootstrapping environment to use ~/.dotfiles"
 
