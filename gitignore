@@ -1,3 +1,5 @@
 *.swo
 *.swp
 tags
+**/local
+**/models/*_drop_after_*.js
