@@ -1,0 +1,40 @@
+-- Verify [% project %]:[% change %] on [% engine %]
+
+BEGIN;
+
+[%-#---------------------------------------------------------------------------%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?functions/(.*?)$')) -%]
+
+SELECT has_function_privilege('[% matches.0 %].[% matches.1 %]()', 'execute');
+SELECT has_function_privilege('[% matches.0 %].[% matches.1 %](uuid)', 'execute');
+
+[%- END -%]
+
+[%-#---------------------------------------------------------------------------%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?schemas/(.*?)$')) -%]
+
+SELECT pg_catalog.has_schema_privilege('[% matches.1 %]', 'usage');
+
+[%- END -%]
+
+[%-#---------------------------------------------------------------------------%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?tables\/(.*?)(_add.*|_repair.*|_refactor.*)?$')) -%]
+
+SELECT * FROM [% (matches.0 || env.SQITCH_DEFAULT_SCHEMA) _ '.' _ matches.1 %] WHERE false;
+
+[%- END -%]
+
+[%-#---------------------------------------------------------------------------%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?types/(.*?)$')) -%]
+
+SELECT
+  1/count(*) -- exists
+FROM
+  pg_type
+WHERE
+  typname = '[% matches.1 %]' AND
+  typnamespace = (select oid from pg_namespace where nspname = '[% matches.0 %]');
+
+[%- END -%]
+
+ROLLBACK;

@@ -1,0 +1,108 @@
+[%- USE env = EnvHash -%]
+-- Deploy [% project %]:[% change %] to [% engine %]
+[% FOREACH item IN requires -%]
+-- requires: [% item %]
+[% END -%]
+[% FOREACH item IN conflicts -%]
+-- conflicts: [% item %]
+[% END -%]
+
+BEGIN;
+
+[%-#---------------------------------------------------------------------------%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?functions/(.*?)$')) -%]
+
+CREATE FUNCTION [% matches.0 %].[% matches.1 %]
+(
+  p_id uuid,
+  p_datetime timestamp with time zone default [% matches.0 %].some_function()
+)
+RETURNS boolean
+LANGUAGE 'plpgsql'
+  AS
+$BODY$
+BEGIN
+
+END;
+$BODY$;
+
+CREATE FUNCTION [% matches.0 %].[% matches.1 %](in uuid, in timestampts, out some_name uuid)
+  AS
+$SQL$
+
+  SELECT
+    id
+  FROM
+    [% matches.0 %].some_table
+  WHERE
+    id = $1;
+
+$SQL$
+LANGUAGE SQL IMMUTABLE;
+
+COMMENT ON FUNCTION [% matches.0 %].[% matches.1 %](uuid, timestamptz) IS
+'A nice function comment.';
+
+[%- END -%]
+
+[%-#---------------------------------------------------------------------------%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?schemas/(.*?)$')) -%]
+
+DO $$ BEGIN PERFORM create_new_schema('[% matches.1 %]'); END $$;
+
+COMMENT ON SCHEMA [% matches.1 %] IS
+'[% note %]';
+
+[%- END -%]
+
+[%-#---------------------------------------------------------------------------%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?tables\/(.*?)(_add.*|_repair.*|_refactor.*)?$')) -%]
+
+CREATE TABLE [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %] (
+  id uuid default public.gen_random_uuid() not null,
+  name citext not null,
+  description text,
+  rstatus [% env.SQITCH_DEFAULT_SCHEMA %].rstatus default 'active'::[% env.SQITCH_DEFAULT_SCHEMA %].rstatus not null,
+  created_at timestamp with time zone default CURRENT_TIMESTAMP not null,
+  created_by uuid,
+  updated_at timestamp with time zone default CURRENT_TIMESTAMP not null,
+  updated_by uuid,
+  PRIMARY KEY (id),
+  UNIQUE (name),
+  FOREIGN KEY (created_by) REFERENCES [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].users (id)
+    ON UPDATE CASCADE ON DELETE RESTRICT,
+  FOREIGN KEY (updated_by) REFERENCES [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].users (id)
+    ON UPDATE CASCADE ON DELETE RESTRICT
+);
+
+[%- comment_entity = (matches.0 || env.SQITCH_DEFAULT_SCHEMA) _ '.' _ matches.1 -%]
+
+COMMENT ON TABLE [% comment_entity %] IS
+'Describe the table as concisely as practical.';
+
+COMMENT ON COLUMN [% comment_entity %].name IS
+'The name displayed on the frontend. This is predominantly presentational.';
+
+COMMENT ON COLUMN [% comment_entity %].description IS
+'The case description displayed on the frontend. This is predominantly presentational.';
+
+COMMENT ON COLUMN [% comment_entity %].rstatus IS
+'The status of the record. One of `active`, `inactive`, or `deleted`.';
+
+[%- END -%]
+
+[%-#---------------------------------------------------------------------------%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?types/(.*?)$')) -%]
+
+CREATE TYPE [% matches.0 %].[% matches.1 %] AS ENUM (
+  'foo',
+  'bar',
+  'baz'
+);
+
+COMMENT ON TYPE [% matches.0 %].[% matches.1 %] IS
+'Nice comment about a type.';
+
+[%- END -%]
+
+COMMIT;

@@ -1,0 +1,34 @@
+-- Revert [% project %]:[% change %] from [% engine %]
+
+BEGIN;
+
+[%-#---------------------------------------------------------------------------%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?functions/(.*?)$')) -%]
+
+DROP FUNCTION [% matches.0 %].[% matches.1 %](in uuid, out uuid);
+DROP FUNCTION [% matches.0 %].[% matches.1 %](in uuid, in uuid);
+
+[%- END -%]
+
+[%-#---------------------------------------------------------------------------%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?schemas/(.*?)$')) -%]
+
+DROP SCHEMA [% matches.1 %];
+
+[%- END -%]
+
+[%-#---------------------------------------------------------------------------%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?tables\/(.*?)(_add.*|_repair.*|_refactor.*)?$')) -%]
+
+DROP TABLE [% (matches.0 || env.SQITCH_DEFAULT_SCHEMA) _ '.' _ matches.1 %];
+
+[%- END -%]
+
+[%-#---------------------------------------------------------------------------%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?types/(.*?)$')) -%]
+
+DROP TYPE [% matches.0 %].[% matches.1 %];
+
+[%- END -%]
+
+COMMIT;
