@@ -1,12 +1,20 @@
+[%- USE env = EnvHash -%]
 -- Revert [% project %]:[% change %] from [% engine %]
 
 BEGIN;
 
 [%-#---------------------------------------------------------------------------%]
-[%- IF (matches = change.match('^(?:(.*?)\/)?functions/(.*?)$')) -%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?func(?:tions)?/(.*?)$')) -%]
 
-DROP FUNCTION [% matches.0 %].[% matches.1 %](in uuid, out uuid);
-DROP FUNCTION [% matches.0 %].[% matches.1 %](in uuid, in uuid);
+DROP FUNCTION [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %](in uuid, out uuid);
+DROP FUNCTION [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %](in uuid, in uuid);
+
+[%- END -%]
+
+[%-#---------------------------------------------------------------------------%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?roles/(.*?)$')) -%]
+
+DROP ROLE [% matches.1 %];
 
 [%- END -%]
 
@@ -25,9 +33,27 @@ DROP TABLE [% (matches.0 || env.SQITCH_DEFAULT_SCHEMA) _ '.' _ matches.1 %];
 [%- END -%]
 
 [%-#---------------------------------------------------------------------------%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?triggers/(.*?)$')) -%]
+
+DROP TRIGGER trg_some_table_iu ON [% matches.0 %].some_table;
+
+DROP FUNCTION [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].trg_some_table();
+
+[%- END -%]
+
+[%-#---------------------------------------------------------------------------%]
 [%- IF (matches = change.match('^(?:(.*?)\/)?types/(.*?)$')) -%]
 
-DROP TYPE [% matches.0 %].[% matches.1 %];
+DROP TYPE [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %];
+
+[%- END -%]
+
+[%-#---------------------------------------------------------------------------%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?users/(.*?)(_alter.*)$')) -%]
+
+DROP USER [% matches.1 %];
+
+ALTER USER [% matches.1 %] WITH NOBYPASSRLS;
 
 [%- END -%]
 

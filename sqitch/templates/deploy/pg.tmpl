@@ -10,12 +10,12 @@
 BEGIN;
 
 [%-#---------------------------------------------------------------------------%]
-[%- IF (matches = change.match('^(?:(.*?)\/)?functions/(.*?)$')) -%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?func(?:tions)?/(.*?)$')) -%]
 
-CREATE FUNCTION [% matches.0 %].[% matches.1 %]
+CREATE FUNCTION [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %]
 (
   p_id uuid,
-  p_datetime timestamp with time zone default [% matches.0 %].some_function()
+  p_datetime timestamp with time zone default [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].some_function()
 )
 RETURNS boolean
 LANGUAGE 'plpgsql'
@@ -26,22 +26,33 @@ BEGIN
 END;
 $BODY$;
 
-CREATE FUNCTION [% matches.0 %].[% matches.1 %](in uuid, in timestampts, out some_name uuid)
+CREATE FUNCTION [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %](in uuid, in timestampts, out some_name uuid)
   AS
 $SQL$
 
   SELECT
     id
   FROM
-    [% matches.0 %].some_table
+    [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].some_table
   WHERE
     id = $1;
 
 $SQL$
 LANGUAGE SQL IMMUTABLE;
 
-COMMENT ON FUNCTION [% matches.0 %].[% matches.1 %](uuid, timestamptz) IS
+COMMENT ON FUNCTION [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %](uuid, timestamptz) IS
 'A nice function comment.';
+
+[%- END -%]
+
+[%-#---------------------------------------------------------------------------%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?roles/(.*?)$')) -%]
+
+-- https://www.postgresql.org/docs/current/sql-createrole.html
+CREATE ROLE [% matches.1 %] IN ROLE foo;
+
+COMMENT ON ROLE [% matches.1 %] IS
+'A nice role comment. User must be superuser or have `CREATEROLE` privilege.';
 
 [%- END -%]
 
@@ -92,16 +103,64 @@ COMMENT ON COLUMN [% comment_entity %].rstatus IS
 [%- END -%]
 
 [%-#---------------------------------------------------------------------------%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?triggers/(.*?)$')) -%]
+
+CREATE FUNCTION [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].trg_some_table() RETURNS TRIGGER AS
+$BODY$
+BEGIN
+
+  -- Stop something from happening or something.
+  IF [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].some_function(NEW.id) = FALSE THEN
+    RAISE EXCEPTION 'oh no!';
+  END IF;
+
+  RETURN NEW;
+
+END;
+$BODY$
+LANGUAGE 'plpgsql';
+
+CREATE TRIGGER trg_some_table_iu
+  BEFORE INSERT OR UPDATE ON [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].some_table
+    FOR EACH ROW
+    EXECUTE PROCEDURE [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].trg_some_table();
+
+COMMENT ON TRIGGER trg_some_table_iu ON [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].some_table IS
+'Some description about a trigger.';
+
+[%- END -%]
+
+[%-#---------------------------------------------------------------------------%]
 [%- IF (matches = change.match('^(?:(.*?)\/)?types/(.*?)$')) -%]
 
-CREATE TYPE [% matches.0 %].[% matches.1 %] AS ENUM (
+CREATE TYPE [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %] AS ENUM (
   'foo',
   'bar',
   'baz'
 );
 
-COMMENT ON TYPE [% matches.0 %].[% matches.1 %] IS
+COMMENT ON TYPE [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %] IS
 'Nice comment about a type.';
+
+[%- END -%]
+
+[%-#---------------------------------------------------------------------------%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?users/(.*?)(_alter.*)$')) -%]
+
+-- https://www.postgresql.org/docs/current/sql-createrole.html
+CREATE USER [% matches.1 %] WITH
+  SUPERUSER
+  CREATEDB
+  INHERIT
+  LOGIN
+  REPLICATION
+  BYPASSRLS
+  CONNECTION LIMIT 1
+  PASSWORD ''
+  VALID UNTIL 'timstamptz'
+  ;
+
+ALTER USER [% matches.1 %] WITH BYPASSRLS;
 
 [%- END -%]
 

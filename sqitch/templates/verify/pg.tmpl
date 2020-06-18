@@ -1,3 +1,4 @@
+[%- USE env = EnvHash -%]
 -- Verify [% project %]:[% change %] on [% engine %]
 
 BEGIN;
@@ -5,8 +6,20 @@ BEGIN;
 [%-#---------------------------------------------------------------------------%]
 [%- IF (matches = change.match('^(?:(.*?)\/)?functions/(.*?)$')) -%]
 
-SELECT has_function_privilege('[% matches.0 %].[% matches.1 %]()', 'execute');
-SELECT has_function_privilege('[% matches.0 %].[% matches.1 %](uuid)', 'execute');
+SELECT has_function_privilege('[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %]()', 'execute');
+SELECT has_function_privilege('[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %](uuid)', 'execute');
+
+-- https://www.postgresql.org/docs/12/infoschema-routines.html
+SELECT
+  1/(COUNT(*) = 0)::integer -- does not exist
+  1/(COUTN(*) = 1)::integer -- exists
+  1/(count(*) = 2)::integer -- 2 exist
+FROM
+  information_schema.routines
+WHERE
+  routine_schema = '[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %]' AND
+  routine_name = 'some_function_name' AND
+  data_type = 'uuid'; -- function return type
 
 [%- END -%]
 
@@ -18,9 +31,48 @@ SELECT pg_catalog.has_schema_privilege('[% matches.1 %]', 'usage');
 [%- END -%]
 
 [%-#---------------------------------------------------------------------------%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?roles/(.*?)$')) -%]
+
+-- Will raise an error if this role does not exist (fulfilling verify)
+SET LOCAL ROLE [% matches.1 %];
+
+[%- END -%]
+
+[%-#---------------------------------------------------------------------------%]
 [%- IF (matches = change.match('^(?:(.*?)\/)?tables\/(.*?)(_add.*|_repair.*|_refactor.*)?$')) -%]
 
 SELECT * FROM [% (matches.0 || env.SQITCH_DEFAULT_SCHEMA) _ '.' _ matches.1 %] WHERE false;
+
+[%- END -%]
+
+[%-#---------------------------------------------------------------------------%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?triggers/(.*?)$')) -%]
+
+SELECT has_function_privilege('[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %]()', 'execute');
+SELECT has_function_privilege('[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %](uuid)', 'execute');
+
+SELECT
+  1/count(*) -- 1 exists
+  1/(count(*) = 2)::integer -- 2 exist
+FROM
+  pg_trigger
+WHERE
+  NOT tgisinternal
+  AND tgrelid = '[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].some_table'::regclass
+  AND tgname IN (
+    '[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %]_some_table_insert_trigger',
+    '[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %]_some_table_update_trigger'
+  );
+
+-- https://www.postgresql.org/docs/12/infoschema-routines.html
+SELECT
+  1/(COUNT(*) = 0)::integer
+FROM
+  information_schema.routines
+WHERE
+  routine_schema = '[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %]' AND
+  routine_name = 'some_function_name' AND
+  data_type = 'trigger'; -- function return type
 
 [%- END -%]
 
@@ -33,7 +85,14 @@ FROM
   pg_type
 WHERE
   typname = '[% matches.1 %]' AND
-  typnamespace = (select oid from pg_namespace where nspname = '[% matches.0 %]');
+  typnamespace = (select oid from pg_namespace where nspname = '[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %]');
+
+[%- END -%]
+
+[%-#---------------------------------------------------------------------------%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?users/(.*?)(_alter.*)$')) -%]
+
+SET LOCAL role TO [% matches.1 %];
 
 [%- END -%]
 
