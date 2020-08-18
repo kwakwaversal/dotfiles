@@ -67,7 +67,7 @@ COMMENT ON SCHEMA [% matches.1 %] IS
 [%- END -%]
 
 [%-#---------------------------------------------------------------------------%]
-[%- IF (matches = change.match('^(?:(.*?)\/)?tables\/(.*?)(_add.*|_repair.*|_refactor.*)?$')) -%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?tables\/(.*?)(_add.*|_alter.*|_repair.*|_refactor.*)?$')) -%]
 
 CREATE TABLE [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %] (
   id uuid default public.gen_random_uuid() not null,
@@ -100,12 +100,17 @@ COMMENT ON COLUMN [% comment_entity %].description IS
 COMMENT ON COLUMN [% comment_entity %].rstatus IS
 'The status of the record. One of `active`, `inactive`, or `deleted`.';
 
+[%- IF (submatches = change.match('.*?_alter_(.*)_(?:add|and|as|to).*')) -%]
+ALTER TABLE [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %]
+  ALTER column [% submatches.0 || 'foo' %] DROP NOT NULL;
+[%- END -%]
+
 [%- END -%]
 
 [%-#---------------------------------------------------------------------------%]
 [%- IF (matches = change.match('^(?:(.*?)\/)?triggers/(.*?)$')) -%]
 
-CREATE FUNCTION [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].trg_some_table() RETURNS TRIGGER AS
+CREATE FUNCTION [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %]() RETURNS TRIGGER AS
 $BODY$
 BEGIN
 
@@ -123,6 +128,9 @@ LANGUAGE 'plpgsql';
 CREATE TRIGGER trg_some_table_iu
   BEFORE INSERT OR UPDATE ON [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].some_table
     FOR EACH ROW
+    WHEN (
+      NEW.foo = 'bar'
+    )
     EXECUTE PROCEDURE [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].trg_some_table();
 
 COMMENT ON TRIGGER trg_some_table_iu ON [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].some_table IS

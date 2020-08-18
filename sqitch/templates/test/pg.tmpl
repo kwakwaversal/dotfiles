@@ -8,7 +8,7 @@ SELECT no_plan();
 -- Include common SQL files
 
 \i sql/constants.sql
-\i sql/seeders.sql
+\i sql/seeders/all.sql
 \i sql/test/unit_test_data.sql
 
 /****************************************************************************/
@@ -39,7 +39,7 @@ SELECT is(true, true);
 [%- END -%]
 
 [%-#---------------------------------------------------------------------------%]
-[%- IF (matches = change.match('^(?:(.*?)\/)?tables\/(.*?)(_add.*|_repair.*|_refactor.*)?$')) -%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?tables\/(.*?)(_add.*|_alter.*|_repair.*|_refactor.*)?$')) -%]
 /*****************************************************************************/
 -- Test expected columns
 
@@ -59,6 +59,7 @@ SELECT col_not_null('[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %]', '[% matches.
 -- Include common SQL files
 
 \i sql/constants.sql
+\i sql/seeders/all.sql
 \i sql/test/unit_test_data.sql
 
 /****************************************************************************/
@@ -69,6 +70,14 @@ SELECT col_not_null('[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %]', '[% matches.
 /* DROP FUNCTION IF EXISTS [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %](); */
 
 /* \i deploy/[% change %].sql */
+
+/*****************************************************************************/
+-- Test function
+
+SELECT is([% matches.1 %], NULL, 'missing schema is null')
+  FROM [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %](
+    '{ "users": { "id": ":uuid" } }'::jsonb
+  );
 
 [%- END -%]
 

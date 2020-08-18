@@ -26,9 +26,12 @@ DROP SCHEMA [% matches.1 %];
 [%- END -%]
 
 [%-#---------------------------------------------------------------------------%]
-[%- IF (matches = change.match('^(?:(.*?)\/)?tables\/(.*?)(_add.*|_repair.*|_refactor.*)?$')) -%]
+[%- IF (matches = change.match('^(?:(.*?)\/)?tables\/(.*?)(_add.*|_alter.*|_repair.*|_refactor.*)?$')) -%]
 
 DROP TABLE [% (matches.0 || env.SQITCH_DEFAULT_SCHEMA) _ '.' _ matches.1 %];
+
+ALTER TABLE [% (matches.0 || env.SQITCH_DEFAULT_SCHEMA) _ '.' _ matches.1 %]
+  ALTER COLUMN foo SET NOT NULL;
 
 [%- END -%]
 
