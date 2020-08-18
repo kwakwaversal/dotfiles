@@ -32,6 +32,13 @@ function g {
 alias ga='git add'
 alias gc='git commit'
 alias gcd='cd $(git rev-parse --show-toplevel)' # change to repo root directory
+function gco {
+  if [ "$#" -ne 0 ]; then
+    git checkout $@
+  else
+    git checkout $(git branch | fzf)
+  fi
+}
 alias gd='git diff'             # What's changed? Both staged and unstaged.
 alias gds='git diff --staged'   # What's changed? Only staged (added) changes.
 alias gl='git log'
