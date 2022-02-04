@@ -1,4 +1,7 @@
 [%- USE env = EnvHash -%]
+[%- MACRO schema(name) BLOCK -%]
+  [%- name || env.SQITCH_DEFAULT_SCHEMA -%]
+[%- END -%]
 -- Revert [% project %]:[% change %] from [% engine %]
 
 BEGIN;
@@ -6,8 +9,8 @@ BEGIN;
 [%-#---------------------------------------------------------------------------%]
 [%- IF (matches = change.match('^(?:(.*?)\/)?func(?:tions)?/(.*?)$')) -%]
 
-DROP FUNCTION [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %](in uuid, out uuid);
-DROP FUNCTION [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %](in uuid, in uuid);
+DROP FUNCTION [% schema(matches.0) %].[% matches.1 %](in uuid, out uuid);
+DROP FUNCTION [% schema(matches.0) %].[% matches.1 %](in uuid, in uuid);
 
 [%- END -%]
 
@@ -28,9 +31,9 @@ DROP SCHEMA [% matches.1 %];
 [%-#---------------------------------------------------------------------------%]
 [%- IF (matches = change.match('^(?:(.*?)\/)?tables\/(.*?)(_add.*|_alter.*|_repair.*|_refactor.*)?$')) -%]
 
-DROP TABLE [% (matches.0 || env.SQITCH_DEFAULT_SCHEMA) _ '.' _ matches.1 %];
+DROP TABLE [% schema(matches.0) %].[% matches.1 %];
 
-ALTER TABLE [% (matches.0 || env.SQITCH_DEFAULT_SCHEMA) _ '.' _ matches.1 %]
+ALTER TABLE [% schema(matches.0) %].[% matches.1 %]
   ALTER COLUMN foo SET NOT NULL;
 
 [%- END -%]
@@ -40,14 +43,14 @@ ALTER TABLE [% (matches.0 || env.SQITCH_DEFAULT_SCHEMA) _ '.' _ matches.1 %]
 
 DROP TRIGGER trg_some_table_iu ON [% matches.0 %].some_table;
 
-DROP FUNCTION [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].trg_some_table();
+DROP FUNCTION [% schema(matches.0) %].trg_some_table();
 
 [%- END -%]
 
 [%-#---------------------------------------------------------------------------%]
 [%- IF (matches = change.match('^(?:(.*?)\/)?types/(.*?)$')) -%]
 
-DROP TYPE [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %];
+DROP TYPE [% schema(matches.0) %].[% matches.1 %];
 
 [%- END -%]
 

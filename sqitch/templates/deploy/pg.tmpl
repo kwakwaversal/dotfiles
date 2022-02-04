@@ -1,4 +1,7 @@
 [%- USE env = EnvHash -%]
+[%- MACRO schema(name) BLOCK -%]
+  [%- name || env.SQITCH_DEFAULT_SCHEMA -%]
+[%- END -%]
 -- Deploy [% project %]:[% change %] to [% engine %]
 [% FOREACH item IN requires -%]
 -- requires: [% item %]
@@ -12,13 +15,67 @@ BEGIN;
 [%-#---------------------------------------------------------------------------%]
 [%- IF (matches = change.match('^(?:(.*?)\/)?func(?:tions)?/(.*?)$')) -%]
 
-CREATE FUNCTION [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %]
+[%- IF (matches.1.match('_trigger$')) -%]
+
+CREATE FUNCTION [% schema(matches.0) %].[% matches.1 %]() RETURNS TRIGGER AS
+$BODY$
+BEGIN
+
+  -- Stop something from happening or something.
+  IF [% schema(matches.0) %].some_function(NEW.id) = FALSE THEN
+    RAISE EXCEPTION 'oh no!';
+  END IF;
+
+  RETURN NEW;
+
+END;
+$BODY$
+LANGUAGE 'plpgsql';
+
+COMMENT ON FUNCTION [% schema(matches.0) %].[% matches.1 %]() IS
+'A nice trigger function comment.';
+
+CREATE TRIGGER [% schema(matches.0) %]_[% matches.1 %]
+  BEFORE UPDATE ON [% schema(matches.0) %].table FOR EACH ROW
+    WHEN (OLD.random_number IS NOT DISTINCT FROM NEW.random_number)
+    EXECUTE PROCEDURE [% schema(matches.0) %].[% matches.1 %]();
+
+CREATE TRIGGER [% schema(matches.0) %]_[% matches.1 %]
+  AFTER DELETE OR INSERT OR UPDATE ON [% schema(matches.0) %].table
+    FOR EACH ROW
+    EXECUTE PROCEDURE [% schema(matches.0) %].[% matches.1 %]();
+
+CREATE TRIGGER [% schema(matches.0) %]_[% matches.1 %]
+  AFTER INSERT ON [% schema(matches.0) %].table
+    REFERENCING NEW TABLE AS changedrecords
+    FOR EACH STATEMENT
+    EXECUTE PROCEDURE [% schema(matches.0) %].[% matches.1 %]();
+
+CREATE TRIGGER [% schema(matches.0) %]_[% matches.1 %]
+  AFTER UPDATE ON [% schema(matches.0) %].table
+    REFERENCING NEW TABLE AS changedrecords
+    FOR EACH STATEMENT
+    EXECUTE PROCEDURE [% schema(matches.0) %].[% matches.1 %]();
+
+CREATE TRIGGER [% schema(matches.0) %]_[% matches.1 %]
+  AFTER DELETE ON [% schema(matches.0) %].table
+    REFERENCING OLD TABLE AS changedrecords
+    FOR EACH STATEMENT
+    EXECUTE PROCEDURE [% schema(matches.0) %].[% matches.1 %]();
+
+COMMENT ON TRIGGER [% schema(matches.0) %]_[% matches.1 %] ON [% schema(matches.0) %].table IS
+'Some description about a trigger.';
+
+[%- ELSE -%]
+
+CREATE FUNCTION [% schema(matches.0) %].[% matches.1 %]
 (
   p_id uuid,
-  p_datetime timestamp with time zone default [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].some_function()
+  p_datetime timestamp with time zone default [% schema(matches.0) %].some_function()
 )
 RETURNS boolean
 LANGUAGE 'plpgsql'
+SECURITY DEFINER
   AS
 $BODY$
 BEGIN
@@ -26,22 +83,24 @@ BEGIN
 END;
 $BODY$;
 
-CREATE FUNCTION [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %](in uuid, in timestampts, out some_name uuid)
+CREATE FUNCTION [% schema(matches.0) %].[% matches.1 %](in p_arg1 uuid, in p_arg3 timestampts, out some_name uuid)
   AS
 $SQL$
 
   SELECT
     id
   FROM
-    [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].some_table
+    [% schema(matches.0) %].some_table
   WHERE
     id = $1;
 
 $SQL$
 LANGUAGE SQL IMMUTABLE;
 
-COMMENT ON FUNCTION [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %](uuid, timestamptz) IS
+COMMENT ON FUNCTION [% schema(matches.0) %].[% matches.1 %](uuid, timestamptz) IS
 'A nice function comment.';
+
+[%- END -%]
 
 [%- END -%]
 
@@ -69,20 +128,20 @@ COMMENT ON SCHEMA [% matches.1 %] IS
 [%-#---------------------------------------------------------------------------%]
 [%- IF (matches = change.match('^(?:(.*?)\/)?tables\/(.*?)(_add.*|_alter.*|_repair.*|_refactor.*)?$')) -%]
 
-CREATE TABLE [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %] (
+CREATE TABLE [% schema(matches.0) %].[% matches.1 %] (
   id uuid default public.gen_random_uuid() not null,
   name citext not null,
   description text,
-  rstatus [% env.SQITCH_DEFAULT_SCHEMA %].rstatus default 'active'::[% env.SQITCH_DEFAULT_SCHEMA %].rstatus not null,
+  rstatus [% schema(matches.0) %].rstatus default 'active'::[% schema(matches.0) %].rstatus not null,
   created_at timestamp with time zone default CURRENT_TIMESTAMP not null,
   created_by uuid,
   updated_at timestamp with time zone default CURRENT_TIMESTAMP not null,
   updated_by uuid,
   PRIMARY KEY (id),
   UNIQUE (name),
-  FOREIGN KEY (created_by) REFERENCES [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].users (id)
+  FOREIGN KEY (created_by) REFERENCES [% schema(matches.0) %].users (id)
     ON UPDATE CASCADE ON DELETE RESTRICT,
-  FOREIGN KEY (updated_by) REFERENCES [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].users (id)
+  FOREIGN KEY (updated_by) REFERENCES [% schema(matches.0) %].users (id)
     ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
@@ -110,12 +169,12 @@ ALTER TABLE [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %]
 [%-#---------------------------------------------------------------------------%]
 [%- IF (matches = change.match('^(?:(.*?)\/)?triggers/(.*?)$')) -%]
 
-CREATE FUNCTION [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %]() RETURNS TRIGGER AS
+CREATE FUNCTION [% schema(matches.0) %].[% matches.1 %]() RETURNS TRIGGER AS
 $BODY$
 BEGIN
 
   -- Stop something from happening or something.
-  IF [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].some_function(NEW.id) = FALSE THEN
+  IF [% schema(matches.0) %].some_function(NEW.id) = FALSE THEN
     RAISE EXCEPTION 'oh no!';
   END IF;
 
@@ -126,14 +185,14 @@ $BODY$
 LANGUAGE 'plpgsql';
 
 CREATE TRIGGER trg_some_table_iu
-  BEFORE INSERT OR UPDATE ON [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].some_table
+  BEFORE INSERT OR UPDATE ON [% schema(matches.0) %].some_table
     FOR EACH ROW
     WHEN (
       NEW.foo = 'bar'
     )
-    EXECUTE PROCEDURE [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].trg_some_table();
+    EXECUTE PROCEDURE [% schema(matches.0) %].trg_some_table();
 
-COMMENT ON TRIGGER trg_some_table_iu ON [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].some_table IS
+COMMENT ON TRIGGER trg_some_table_iu ON [% schema(matches.0) %].some_table IS
 'Some description about a trigger.';
 
 [%- END -%]
@@ -141,13 +200,13 @@ COMMENT ON TRIGGER trg_some_table_iu ON [% matches.0 || env.SQITCH_DEFAULT_SCHEM
 [%-#---------------------------------------------------------------------------%]
 [%- IF (matches = change.match('^(?:(.*?)\/)?types/(.*?)$')) -%]
 
-CREATE TYPE [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %] AS ENUM (
+CREATE TYPE [% schema(matches.0) %].[% matches.1 %] AS ENUM (
   'foo',
   'bar',
   'baz'
 );
 
-COMMENT ON TYPE [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %] IS
+COMMENT ON TYPE [% schema(matches.0) %].[% matches.1 %] IS
 'Nice comment about a type.';
 
 [%- END -%]

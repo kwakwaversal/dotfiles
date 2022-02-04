@@ -1,4 +1,7 @@
 [%- USE env = EnvHash -%]
+[%- MACRO schema(name) BLOCK -%]
+  [%- name || env.SQITCH_DEFAULT_SCHEMA -%]
+[%- END -%]
 -- Verify [% project %]:[% change %] on [% engine %]
 
 BEGIN;
@@ -6,8 +9,8 @@ BEGIN;
 [%-#---------------------------------------------------------------------------%]
 [%- IF (matches = change.match('^(?:(.*?)\/)?functions/(.*?)$')) -%]
 
-SELECT has_function_privilege('[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %]()', 'execute');
-SELECT has_function_privilege('[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %](uuid)', 'execute');
+SELECT has_function_privilege('[% schema(matches.0) %].[% matches.1 %]()', 'execute');
+SELECT has_function_privilege('[% schema(matches.0) %].[% matches.1 %](uuid)', 'execute');
 
 -- https://www.postgresql.org/docs/12/infoschema-routines.html
 SELECT
@@ -17,7 +20,7 @@ SELECT
 FROM
   information_schema.routines
 WHERE
-  routine_schema = '[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %]' AND
+  routine_schema = '[% schema(matches.0) %]' AND
   routine_name = '[% matches.1 %]' AND
   data_type = 'uuid'; -- function return type
 
@@ -41,14 +44,14 @@ SET LOCAL ROLE [% matches.1 %];
 [%-#---------------------------------------------------------------------------%]
 [%- IF (matches = change.match('^(?:(.*?)\/)?tables\/(.*?)(_add.*|_alter.*|_repair.*|_refactor.*)?$')) -%]
 
-SELECT * FROM [% (matches.0 || env.SQITCH_DEFAULT_SCHEMA) _ '.' _ matches.1 %] WHERE false;
+SELECT * FROM [% schema(matches.0) %] WHERE false;
 
 SELECT
   1 / COUNT(*)
 FROM
   information_schema.columns
 WHERE
-  table_schema = '[% (matches.0 || env.SQITCH_DEFAULT_SCHEMA) %]'
+  table_schema = '[% schema(matches.0) %]'
   AND table_name = '[% matches.1 %]'
   AND column_name = 'foo'
   AND is_nullable = 'YES';
@@ -58,8 +61,8 @@ WHERE
 [%-#---------------------------------------------------------------------------%]
 [%- IF (matches = change.match('^(?:(.*?)\/)?triggers/(.*?)$')) -%]
 
-SELECT has_function_privilege('[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %]()', 'execute');
-SELECT has_function_privilege('[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %](uuid)', 'execute');
+SELECT has_function_privilege('[% schema(matches.0) %].[% matches.1 %]()', 'execute');
+SELECT has_function_privilege('[% schema(matches.0) %].[% matches.1 %](uuid)', 'execute');
 
 SELECT
   1/count(*) -- 1 exists
@@ -68,10 +71,10 @@ FROM
   pg_trigger
 WHERE
   NOT tgisinternal
-  AND tgrelid = '[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].some_table'::regclass
+  AND tgrelid = '[% schema(matches.0) %].some_table'::regclass
   AND tgname IN (
-    '[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %]_some_table_insert_trigger',
-    '[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %]_some_table_update_trigger'
+    '[% schema(matches.0) %]_some_table_insert_trigger',
+    '[% schema(matches.0) %]_some_table_update_trigger'
   );
 
 -- https://www.postgresql.org/docs/12/infoschema-routines.html
@@ -80,7 +83,7 @@ SELECT
 FROM
   information_schema.routines
 WHERE
-  routine_schema = '[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %]' AND
+  routine_schema = '[% schema(matches.0) %]' AND
   routine_name = 'some_function_name' AND
   data_type = 'trigger'; -- function return type
 
@@ -95,7 +98,7 @@ FROM
   pg_type
 WHERE
   typname = '[% matches.1 %]' AND
-  typnamespace = (select oid from pg_namespace where nspname = '[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %]');
+  typnamespace = (select oid from pg_namespace where nspname = '[% schema(matches.0) %]');
 
 [%- END -%]
 

@@ -1,22 +1,26 @@
+[%- USE env = EnvHash -%]
+[%- MACRO schema(name) BLOCK -%]
+  [%- name || env.SQITCH_DEFAULT_SCHEMA -%]
+[%- END -%]
 BEGIN;
 
 SELECT no_plan();
 
 [%-#---------------------------------------------------------------------------%]
 [%- IF (matches = change.match('^(?:(.*?)\/)?func(?:tions)?/(.*?)$')) -%]
+
 /*****************************************************************************/
 -- Include common SQL files
 
 \i sql/constants.sql
 \i sql/seeders/all.sql
-\i sql/test/unit_test_data.sql
 
 /****************************************************************************/
 -- Uncomment to make it easier testing functions without sqitch rebasing
 
-/* DROP TRIGGER IF EXISTS [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %]_some_table_trigger on [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].some_table; */
+/* DROP TRIGGER IF EXISTS [% schema(matches.0) %]_some_table_trigger on [% schema(matches.0) %].some_table; */
 
-/* DROP FUNCTION IF EXISTS [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %](); */
+/* DROP FUNCTION IF EXISTS [% schema(matches.0) %].[% matches.1 %](); */
 
 /* \i deploy/[% change %].sql */
 
@@ -31,6 +35,7 @@ SET LOCAL ROLE [% matches.1 %];
 
 [%-#---------------------------------------------------------------------------%]
 [%- IF (matches = change.match('^(?:(.*?)\/)?schemas/(.*?)$')) -%]
+
 /*****************************************************************************/
 -- Reserved test
 
@@ -40,12 +45,13 @@ SELECT is(true, true);
 
 [%-#---------------------------------------------------------------------------%]
 [%- IF (matches = change.match('^(?:(.*?)\/)?tables\/(.*?)(_add.*|_alter.*|_repair.*|_refactor.*)?$')) -%]
+
 /*****************************************************************************/
 -- Test expected columns
 
-SELECT col_is_pk('[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %]', '[% matches.1 %]', 'id', '[% matches.1 %].id *is* a pk');
-SELECT col_is_unique('[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %]', '[% matches.1 %]', ARRAY['name'], '[% matches.1 %].name is unique');
-SELECT col_not_null('[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %]', '[% matches.1 %]', col, 'not null check for [% matches.1 %].' || col)
+SELECT col_is_pk('[% schema(matches.0) %]', '[% matches.1 %]', 'id', '[% matches.1 %].id *is* a pk');
+SELECT col_is_unique('[% schema(matches.0) %]', '[% matches.1 %]', ARRAY['name'], '[% matches.1 %].name is unique');
+SELECT col_not_null('[% schema(matches.0) %]', '[% matches.1 %]', col, 'not null check for [% matches.1 %].' || col)
   FROM (
     VALUES('id'),
           ('name')
@@ -55,19 +61,19 @@ SELECT col_not_null('[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %]', '[% matches.
 
 [%-#---------------------------------------------------------------------------%]
 [%- IF (matches = change.match('^(?:(.*?)\/)?triggers/(.*?)$')) -%]
+
 /*****************************************************************************/
 -- Include common SQL files
 
 \i sql/constants.sql
 \i sql/seeders/all.sql
-\i sql/test/unit_test_data.sql
 
 /****************************************************************************/
 -- Uncomment to make it easier testing functions without sqitch rebasing
 
-/* DROP TRIGGER IF EXISTS [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %]_some_table_trigger on [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].some_table; */
+/* DROP TRIGGER IF EXISTS [% schema(matches.0) %]_some_table_trigger on [% schema(matches.0) %].some_table; */
 
-/* DROP FUNCTION IF EXISTS [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %](); */
+/* DROP FUNCTION IF EXISTS [% schema(matches.0) %].[% matches.1 %](); */
 
 /* \i deploy/[% change %].sql */
 
@@ -75,7 +81,7 @@ SELECT col_not_null('[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %]', '[% matches.
 -- Test function
 
 SELECT is([% matches.1 %], NULL, 'missing schema is null')
-  FROM [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %](
+  FROM [% schema(matches.0) %].[% matches.1 %](
     '{ "users": { "id": ":uuid" } }'::jsonb
   );
 
@@ -83,12 +89,20 @@ SELECT is([% matches.1 %], NULL, 'missing schema is null')
 
 [%-#---------------------------------------------------------------------------%]
 [%- IF (matches = change.match('^(?:(.*?)\/)?types/(.*?)$')) -%]
+
 /*****************************************************************************/
 -- Test type exists
 
-SELECT has_type('[% matches.0 || env.SQITCH_DEFAULT_SCHEMA %]', '[% matches.1 %]', 'has type');
+SELECT has_type('[% schema(matches.0) %]', '[% matches.1 %]', 'has type');
 
 [%- END -%]
+
+/*****************************************************************************/
+-- Testing
+
+SAVEPOINT foo;
+
+ROLLBACK TO SAVEPOINT foo;
 
 /*****************************************************************************/
 -- Finish
