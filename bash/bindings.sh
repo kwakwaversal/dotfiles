@@ -16,5 +16,5 @@ bind '"\el": "\C-l"'
 # Overriding bash shortcut CTRL+f (move forward 1 character) to append `| fzf`
 # to the end of the current command if `fzf` exists in the path.
 if hash fzf >/dev/null 2>&1; then
-    bind '"\C-f": "\C-e| fzf\n"'
+    bind '"\C-f": "\C-e| fzf --ansi\n"'
 fi
