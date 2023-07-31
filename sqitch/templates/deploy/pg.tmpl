@@ -70,8 +70,8 @@ COMMENT ON TRIGGER [% schema(matches.0) %]_[% matches.1 %] ON [% schema(matches.
 
 CREATE FUNCTION [% schema(matches.0) %].[% matches.1 %]
 (
-  p_id uuid,
-  p_datetime timestamp with time zone default [% schema(matches.0) %].some_function()
+  p_id UUID,
+  p_datetime TIMESTAMP WITH TIME ZONE DEFAULT [% schema(matches.0) %].some_function()
 )
 RETURNS boolean
 LANGUAGE 'plpgsql'
@@ -95,7 +95,9 @@ $SQL$
     id = $1;
 
 $SQL$
-LANGUAGE SQL IMMUTABLE;
+LANGUAGE SQL
+IMMUTABLE
+SECURITY DEFINER;
 
 COMMENT ON FUNCTION [% schema(matches.0) %].[% matches.1 %](uuid, timestamptz) IS
 'A nice function comment.';
@@ -129,14 +131,14 @@ COMMENT ON SCHEMA [% matches.1 %] IS
 [%- IF (matches = change.match('^(?:(.*?)\/)?tables\/(.*?)(_add.*|_alter.*|_repair.*|_refactor.*)?$')) -%]
 
 CREATE TABLE [% schema(matches.0) %].[% matches.1 %] (
-  id uuid default public.gen_random_uuid() not null,
-  name citext not null,
-  description text,
-  rstatus [% schema(matches.0) %].rstatus default 'active'::[% schema(matches.0) %].rstatus not null,
-  created_at timestamp with time zone default CURRENT_TIMESTAMP not null,
-  created_by uuid,
-  updated_at timestamp with time zone default CURRENT_TIMESTAMP not null,
-  updated_by uuid,
+  id UUID DEFAULT public.gen_random_uuid() NOT NULL,
+  name CITEXT NOT NULL,
+  description TEXT,
+  rstatus [% schema(matches.0) %].rstatus DEFAULT 'active'::[% schema(matches.0) %].rstatus NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+  created_by UUID,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+  updated_by UUID,
   PRIMARY KEY (id),
   UNIQUE (name),
   FOREIGN KEY (created_by) REFERENCES [% schema(matches.0) %].users (id)
@@ -159,9 +161,21 @@ COMMENT ON COLUMN [% comment_entity %].description IS
 COMMENT ON COLUMN [% comment_entity %].rstatus IS
 'The status of the record. One of `active`, `inactive`, or `deleted`.';
 
-[%- IF (submatches = change.match('.*?_alter_(.*)_(?:add|and|as|to).*')) -%]
+[%- IF (submatches = change.match('.*?_alter_(.*)_(?:add|and|as|to).*')) %]
 ALTER TABLE [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %]
   ALTER column [% submatches.0 || 'foo' %] DROP NOT NULL;
+[%- END -%]
+
+ALTER TABLE [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %]
+  ALTER COLUMN [% submatches.0 || 'foo' %] SET DEFAULT 'hangup';
+
+[%- IF (submatches = change.match('.*?_(?:add)_(.*)')) %]
+ALTER TABLE [% matches.0 || env.SQITCH_DEFAULT_SCHEMA %].[% matches.1 %]
+  ADD COLUMN [% submatches.0 || 'foo' %] integer NOT NULL
+    GENERATED ALWAYS AS IDENTITY (START WITH 100);
+
+COMMENT ON COLUMN [% comment_entity %].[% submatches.0 || 'foo' %] IS
+'A nice comment for a column.';
 [%- END -%]
 
 [%- END -%]

@@ -14,15 +14,26 @@ SELECT has_function_privilege('[% schema(matches.0) %].[% matches.1 %](uuid)', '
 
 -- https://www.postgresql.org/docs/12/infoschema-routines.html
 SELECT
-  1/(COUNT(*) = 0)::integer -- does not exist
-  1/(COUNT(*) = 1)::integer -- exists
-  1/(count(*) = 2)::integer -- 2 exist
+  1 / (COUNT(*) = 0)::INTEGER -- does not exist
+  1 / (COUNT(*) = 1)::INTEGER -- exists
+  1 / (COUNT(*) = 2)::INTEGER -- 2 exist
 FROM
   information_schema.routines
 WHERE
   routine_schema = '[% schema(matches.0) %]' AND
   routine_name = '[% matches.1 %]' AND
   data_type = 'uuid'; -- function return type
+
+SELECT
+  1 / (COUNT(*) = 0)::INTEGER -- does not exist
+  1 / (COUNT(*) = 1)::INTEGER -- exists
+  1 / (COUNT(*) = 2)::INTEGER -- 2 exist
+FROM
+  pg_trigger
+WHERE
+  NOT tgisinternal
+  AND tgrelid = '[% schema(matches.0) %].table'::regclass
+  AND tgname = '[% matches.1 %]';
 
 [%- END -%]
 
@@ -44,10 +55,15 @@ SET LOCAL ROLE [% matches.1 %];
 [%-#---------------------------------------------------------------------------%]
 [%- IF (matches = change.match('^(?:(.*?)\/)?tables\/(.*?)(_add.*|_alter.*|_repair.*|_refactor.*)?$')) -%]
 
-SELECT * FROM [% schema(matches.0) %] WHERE false;
+SELECT * FROM [% schema(matches.0) %].[% matches.1 %] WHERE false;
+
+[%- IF (submatches = change.match('.*?_(?:add)_(.*)')) %]
+SELECT [% submatches.0 || 'foo' %] FROM [% schema(matches.0) %].[% matches.1 %] WHERE FALSE;
+
+[%- END -%]
 
 SELECT
-  1 / COUNT(*)
+  1 / (COUNT(*) = 1)::INTEGER
 FROM
   information_schema.columns
 WHERE

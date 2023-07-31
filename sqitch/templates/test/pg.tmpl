@@ -107,6 +107,8 @@ ROLLBACK TO SAVEPOINT foo;
 /*****************************************************************************/
 -- Finish
 
+SELECT is(1, 1, 'using savepoints mean a final test before finishing');
+
 SELECT * FROM finish();
 
 ROLLBACK;

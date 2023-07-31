@@ -36,6 +36,11 @@ DROP TABLE [% schema(matches.0) %].[% matches.1 %];
 ALTER TABLE [% schema(matches.0) %].[% matches.1 %]
   ALTER COLUMN foo SET NOT NULL;
 
+[%- IF (submatches = change.match('.*?_(?:add)_(.*)')) %]
+ALTER TABLE [% schema(matches.0) %].[% matches.1 %]
+  DROP COLUMN [% submatches.0 || 'foo' %];
+[%- END %]
+
 [%- END -%]
 
 [%-#---------------------------------------------------------------------------%]
