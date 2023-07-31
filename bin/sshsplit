@@ -1,0 +1,114 @@
+#!/bin/bash
+
+# sshsplit - A bash script for creating tmux windows, each with multiple panes.
+# Each pane SSH's into a different server based on a pattern in the SSH config file.
+#
+# Usage: ./sshsplit <ssh host pattern> [range] [max splits]
+#
+# This script takes a pattern and an optional range as command line arguments.
+# The pattern is used to match hostnames in the SSH config file. If a range is
+# provided, the script only considers hostnames with numbers within that range.
+# The pattern and range should match the format used for hostnames in the SSH
+# config file.
+#
+# The script creates a new tmux window for every 5 matched hosts (this number can be
+# changed by modifying the `max_splits` variable). In each window, it creates a pane
+# for each host and initiates an SSH connection.
+#
+# Each window is named according to the pattern and the range of host numbers in that
+# window, which makes it easy to identify the servers connected in each window.
+# The script also synchronizes the panes in each window, meaning that typing in one
+# pane sends the input to all panes in the same window. This is useful for running
+# the same commands on multiple servers simultaneously.
+#
+# Host server1
+#   HostName 192.168.1.101
+#   Port 22
+#   User your_username
+#   IdentityFile ~/.ssh/id_rsa
+#
+# For example, if you have servers named "server1", "server2", ..., "server20" in your
+# SSH config file, you can use the command "./sshsplit server 1-20" to create 4 tmux
+# windows, each with 5 panes connected to 5 different servers.
+#
+# Please make sure to have appropriate permissions to SSH into the servers before
+# running this script.
+
+# Check if arguments are provided
+if [ "$#" -lt 1 ] || [ "$#" -gt 3 ]; then
+  echo "Usage: $0 <ssh host pattern> [range] [max splits]"
+  exit 1
+fi
+
+pattern=$1
+
+# Get the range if provided
+range=${2:-}
+
+# Get the max splits in a single window if provided, default to 5
+max_splits=${3:-5}
+
+# Get matching hosts from ssh config (throw early if none exist under the pattern)
+hosts=$(grep -i "^Host ${pattern}" ~/.ssh/config | awk '{print $2}')
+
+# Check if any hosts were found
+if [ -z "$hosts" ]; then
+  echo "No hosts found matching pattern: $pattern"
+  exit 1
+fi
+
+# Initialize the window count
+window_count=1
+
+# Create the first window with a temporary unique name
+tmux new-window -n TEMP$window_count
+
+# Iterate over each host
+count=0
+
+for host in $(grep -i "^Host ${pattern}" ~/.ssh/config | awk '{print $2}'); do
+  # If a range is provided, check if the host number is within the range
+  if [ -n "$range" ]; then
+    # Extract the number from the host name
+    number=$(echo $host | grep -o -E '[0-9]+')
+    if [[ "$number" -lt ${range%-*} ]] || [[ "$number" -gt ${range#*-} ]]; then
+      # Skip this host if the number is not within the range
+      continue
+    fi
+  fi
+
+  # Check if we've hit the maximum splits in a window
+  if [ "$count" -gt 0 ] && [ $(($count % $max_splits)) -eq 0 ]; then
+    # Create a new window with a temporary unique name
+    window_count=$((window_count + 1))
+    tmux new-window -n TEMP$window_count
+  elif [ "$count" -gt 0 ]; then
+    # Split window vertically
+    tmux split-window -v
+    # Evenly distribute the panes vertically after each split (to maximise
+    # panes per window)
+    tmux select-layout even-vertical
+  fi
+
+  # ssh to host
+  tmux send-keys "ssh $host" C-m
+
+  ((count++))
+
+  echo $host
+done
+
+# Turn on pane synchronization, set layout, and rename each window
+for i in $(seq 1 $window_count); do
+  start=$((($i - 1) * $max_splits + 1))
+  end=$(($i * $max_splits))
+  if [ "$end" -gt "$count" ]; then
+    end=$count
+  fi
+  # Select the window by its temporary unique name
+  tmux select-window -t TEMP$i
+  # Send all input across all panes
+  tmux setw synchronize-panes on
+  # Rename the window with its final name
+  tmux rename-window "$pattern $start-$end"
+done
