@@ -36,7 +36,7 @@ function gco {
   if [ "$#" -ne 0 ]; then
     git checkout $@
   else
-    git checkout $(git branch | fzf)
+    git checkout $(git for-each-ref --sort=-committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)' | fzf)
   fi
 }
 alias gd='git diff'             # What's changed? Both staged and unstaged.
