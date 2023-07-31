@@ -59,6 +59,21 @@ then
     __git_complete g _git
 fi
 
+# Add hosts extracted from `~/.ssh/config` (does not currently work well with
+# aliases).
+#
+# Add these completions to your own commands with:
+#
+# complete -F _ssplit_completions sshsplit
+#
+_sshhost_completions()
+{
+  COMPREPLY=()
+  local word=${COMP_WORDS[COMP_CWORD]}
+  local ssh_config_hosts=$(grep -i "^Host " ~/.ssh/config | awk '{print $2}')
+  COMPREPLY=( $(compgen -W "${ssh_config_hosts}" -- ${word}) )
+}
+
 # https://unix.stackexchange.com/questions/1045/getting-256-colors-to-work-in-tmux
 alias tmux='TERM=xterm-256color tmux'
 alias tx='TERM=xterm-256color tmuxinator'
