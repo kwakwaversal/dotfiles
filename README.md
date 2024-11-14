@@ -60,7 +60,7 @@ share your tmux session with the default [gotty] parameters.
 * [Must have git aliases](http://durdn.com/blog/2012/11/22/must-have-git-aliases-advanced-examples/)
 
 [BASH]: https://www.gnu.org/software/bash/
-[fzf]: https://github.com/junegunn/fzfo
+[fzf]: https://github.com/junegunn/fzf
 [gotty]: https://github.com/yudai/gotty
 [tmux]: https://github.com/tmux/tmux
 [zsh]: http://www.zsh.org/
