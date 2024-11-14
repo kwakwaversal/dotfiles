@@ -20,6 +20,9 @@
     su   = "!git stash && git pull && git stash pop"
     up   = "!git fetch origin && git rebase origin/master"
 
+[color]
+    diff = always
+
 [core]
     editor       = vim
     excludesfile = ~/.dotfiles/gitignore
