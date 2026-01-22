@@ -49,10 +49,11 @@ end of the current command *AND* immediately send `<return>`. See
 
 These tools will enable additional bindings if they exist.
 
-## GoTTY - Share your terminal as a web application
+## ttyd - Share your terminal as a web application
 
-If [gotty] is in the `PATH` it will add the [tmux] binding `CTRL-t`. This will
-share your tmux session with the default [gotty] parameters.
+If [ttyd] is in the `PATH` it will add the [tmux] binding `CTRL-t`. This will
+share your tmux session with the default [ttyd] parameters. See the
+[ttyd installation guide](ttyd-installation.md) for setup instructions.
 
 # References
 * [BASH keyboard shortcuts](https://ss64.com/bash/syntax-keyboard.html)
@@ -61,6 +62,6 @@ share your tmux session with the default [gotty] parameters.
 
 [BASH]: https://www.gnu.org/software/bash/
 [fzf]: https://github.com/junegunn/fzf
-[gotty]: https://github.com/yudai/gotty
+[ttyd]: https://github.com/tsl0922/ttyd
 [tmux]: https://github.com/tmux/tmux
 [zsh]: http://www.zsh.org/
