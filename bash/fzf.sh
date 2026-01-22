@@ -11,8 +11,11 @@ alias ft='fzf-tmux -m'
 alias ftv='vim -p $(fzf-tmux -m)'
 
 # https://github.com/junegunn/fzf.vim/issues/576
-# Use `ag` as the default search command for FZF if it exists
-if hash ag >/dev/null 2>&1; then
+# Use `rg` as the default search command for FZF if it exists, otherwise `ag`
+if hash rg >/dev/null 2>&1; then
+  export FZF_DEFAULT_COMMAND="rg --files --hidden --follow -g '!.git' -g '!node_modules/**'"
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+elif hash ag >/dev/null 2>&1; then
   export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git --ignore node_modules -g ""'
   export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 fi
