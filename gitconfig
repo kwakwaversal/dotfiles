@@ -24,7 +24,7 @@
     diff = always
 
 [core]
-    editor       = vim
+    editor       = nvim
     excludesfile = ~/.dotfiles/gitignore
 
 [diff]
